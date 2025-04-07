@@ -1,0 +1,5 @@
+- name: Upload mod .jar
+  uses: actions/upload-artifact@v3
+  with:
+    name: elarion-valley-mod
+    path: build/libs/*.jar
