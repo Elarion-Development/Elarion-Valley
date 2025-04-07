@@ -1,0 +1,34 @@
+name: Build Mod
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Java
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Make mod buildable
+      run: chmod +x ./gradlew
+
+    - name: Build the mod
+      run: ./gradlew build
+
+    - name: Upload the jar file
+      uses: actions/upload-artifact@v3
+      with:
+        name: elarion-valley
+        path: build/libs/*.jar
+
