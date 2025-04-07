@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elarion Valley - Minecraft Biome Mod</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=MedievalSharp&display=swap');
+        
+        body {
+            font-family: 'Cinzel', serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            background-image: url('https://images.unsplash.com/photo-1605106702734-205df224ecce?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+        }
+        
+        .elven-text {
+            font-family: 'MedievalSharp', cursive;
+        }
+        
+        .glow-text {
+            text-shadow: 0 0 8px rgba(100, 200, 255, 0.7);
+        }
+        
+        .glow-box {
+            box-shadow: 0 0 15px rgba(100, 200, 255, 0.5);
+        }
+        
+        .ancient-parchment {
+            background-image: url('https://www.transparenttextures.com/patterns/old-paper.png');
+            background-color: #f5e7c8;
+            color: #3a3226;
+            border: 1px solid #8b7d65;
+        }
+        
+        .runestone {
+            background: linear-gradient(135deg, #1e3a8a 0%, #0ea5e9 100%);
+            border: 1px solid #7dd3fc;
+        }
+        
+        .shadow-realm {
+            background: linear-gradient(135deg, #1e1b4b 0%, #6b21a8 100%);
+            border: 1px solid #a78bfa;
+        }
+        
+        .faction-elf {
+            border-color: #10b981;
+        }
+        
+        .faction-dwarf {
+            border-color: #f59e0b;
+        }
+        
+        .faction-ranger {
+            border-color: #3b82f6;
+        }
+        
+        .faction-shadow {
+            border-color: #8b5cf6;
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #1e293b;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            border: 1px solid #334155;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .biome-card {
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+        }
+        
+        .biome-card:hover {
+            transform: translateY(-5px) rotateX(5deg);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+        
+        .moon-phase {
+            animation: glow-pulse 8s infinite alternate;
+        }
+        
+        @keyframes glow-pulse {
+            0% { box-shadow: 0 0 10px rgba(100, 200, 255, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(100, 200, 255, 0.8); }
+            100% { box-shadow: 0 0 10px rgba(100, 200, 255, 0.5); }
+        }
+        
+        .floating {
+            animation: floating 6s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .flicker {
+            animation: flicker 5s infinite alternate;
+        }
+        
+        @keyframes flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+                opacity: 1;
+            }
+            20%, 22%, 24%, 55% {
+                opacity: 0.6;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-gray-900 bg-opacity-80 backdrop-blur-md sticky top-0 z-50 border-b border-blue-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-xl font-bold glow-text text-blue-300 elven-text">Elarion Valley</span>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="#overview" class="text-blue-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Overview</a>
+                            <a href="#features" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Features</a>
+                            <a href="#gallery" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Gallery</a>
+                            <a href="#download" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Download</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-4 flex items-center md:ml-6">
+                        <button class="bg-blue-800 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center">
+                            <i class="fas fa-download mr-2"></i> Get the Mod
+                        </button>
+                    </div>
+                </div>
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none">
+                        <span class="sr-only">Open main menu</span>
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="relative overflow-hidden">
+        <div class="max-w-7xl mx-auto">
+            <div class="relative z-10 pb-8 bg-gray-900 bg-opacity-70 sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32">
+                <main class="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
+                    <div class="sm:text-center lg:text-left">
+                        <h1 class="text-4xl tracking-tight font-extrabold text-white sm:text-5xl md:text-6xl">
+                            <span class="block glow-text elven-text">Elarion Valley</span>
+                            <span class="block text-blue-400">A Middle-earth Inspired Biome</span>
+                        </h1>
+                        <p class="mt-3 text-base text-gray-300 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
+                            Step into a realm of ancient magic, towering Valewardens, and forgotten lore. Discover the secrets hidden within the mist-shrouded valleys of Elarion.
+                        </p>
+                        <div class="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
+                            <div class="rounded-md shadow">
+                                <a href="#download" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:py-4 md:text-lg md:px-10">
+                                    Begin Your Journey
+                                </a>
+                            </div>
+                            <div class="mt-3 sm:mt-0 sm:ml-3">
+                                <a href="#features" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-300 bg-gray-700 hover:bg-gray-600 md:py-4 md:text-lg md:px-10">
+                                    Learn More
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+        <div class="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
+            <img class="h-56 w-full object-cover sm:h-72 md:h-96 lg:w-full lg:h-full" src="https://images.unsplash.com/photo-1605106702734-205df224ecce?q=80&w=2070&auto=format&fit=crop" alt="Fantasy landscape">
+        </div>
+    </div>
+
+    <!-- Overview Section -->
+    <section id="overview" class="py-12 bg-gray-900 bg-opacity-80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:text-center">
+                <h2 class="text-base text-blue-400 font-semibold tracking-wide uppercase">Overview</h2>
+                <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-white sm:text-4xl glow-text">
+                    The Legend of Elarion
+                </p>
+                <p class="mt-4 max-w-2xl text-xl text-gray-300 lg:mx-auto">
+                    Once home to an ancient elven civilization, now a land of mystery and danger
+                </p>
+            </div>
+
+            <div class="mt-10">
+                <div class="ancient-parchment rounded-lg p-8 max-w-4xl mx-auto shadow-xl">
+                    <p class="text-lg mb-4 elven-text">
+                        <span class="text-2xl font-bold text-blue-900">E</span>larion Valley was once the jewel of the Eldar kingdoms, a place where magic flowed as freely as the rivers and the trees themselves sang with ancient wisdom. But when the Shadow Wars came, the valley was hidden from the world by powerful enchantments, preserved in time until one worthy of its secrets would discover it again.
+                    </p>
+                    <p class="text-lg mb-4 elven-text">
+                        Now, the valley begins to awaken. The runestones glow brighter, the Valewarden trees whisper more urgently, and the ruins call out to those who might restore their former glory. But beware - not all who seek Elarion's treasures do so with pure intentions, and the Shadowwraiths grow restless in their watch...
+                    </p>
+                    <div class="flex justify-center mt-6">
+                        <div class="runestone rounded-full w-16 h-16 flex items-center justify-center text-white text-2xl">
+                            <i class="fas fa-mountain"></i>
+                        </div>
+                        <div class="runestone rounded-full w-16 h-16 flex items-center justify-center text-white text-2xl ml-4">
+                            <i class="fas fa-tree"></i>
+                        </div>
+                        <div class="runestone rounded-full w-16 h-16 flex items-center justify-center text-white text-2xl ml-4">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="runestone rounded-full w-16 h-16 flex items-center justify-center text-white text-2xl ml-4">
+                            <i class="fas fa-ring"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-12 bg-gray-900 bg-opacity-80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:text-center">
+                <h2 class="text-base text-blue-400 font-semibold tracking-wide uppercase">Features</h2>
+                <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-white sm:text-4xl glow-text">
+                    Discover Elarion's Wonders
+                </p>
+                <p class="mt-4 max-w-2xl text-xl text-gray-300 lg:mx-auto">
+                    A biome rich with magic, mystery, and adventure
+                </p>
+            </div>
+
+            <div class="mt-10">
+                <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                    <!-- Terrain Card -->
+                    <div class="biome-card bg-gray-800 bg-opacity-70 rounded-lg overflow-hidden shadow-lg border border-blue-800 glow-box">
+                        <div class="p-5">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 bg-blue-900 rounded-md p-3">
+                                    <i class="fas fa-mountain text-blue-300 text-xl"></i>
+                                </div>
+                                <div class="ml-5">
+                                    <h3 class="text-lg leading-6 font-medium text-white">Enchanted Terrain</h3>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <p class="text-sm text-gray-300">
+                                    Rolling hills with elven lilies, misty forests with towering Valewarden trees, glowing runestone rivers, and floating sky islands shaped like ancient statues.
+                                </p>
+                                <div class="mt-4">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-900 text-blue-100">
+                                        Moon-cycle lighting
+                                    </span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-900 text-blue-100 ml-1">
+                                        Glowing flora
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tools Card -->
+                    <div class="biome-card bg-gray-800 bg-opacity-70 rounded-lg overflow-hidden shadow-lg border border-blue-800 glow-box">
+                        <div class="p-5">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 bg-blue-900 rounded-md p-3">
+                                    <i class="fas fa-hammer text-blue-300 text-xl"></i>
+                                </div>
+                                <div class="ml-5">
+                                    <h3 class="text-lg leading-6 font-medium text-white">Legendary Tools</h3>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <p class="text-sm text-gray-300">
+                                    Craft the Moonforge Hammer, Elven Bow of the Crescent, Warden's Rootblade, and Rings of the Nine - each with unique magical properties tied to the biome.
+                                </p>
+                                <div class="mt-4">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-900 text-blue-100">
+                                        Moon-powered
+                                    </span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-900 text-blue-100 ml-1">
+                                        Lore-driven
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Magic Card -->
+                    <div class="biome-card bg-gray-800 bg-opacity-70 rounded-lg overflow-hidden shadow-lg border border-blue-800 glow-box">
+                        <div class="p-5">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 bg-blue-900 rounded-md p-3">
+                                    <i class="fas fa-hat-wizard text-blue-300 text-xl"></i>
+                                </div>
+                                <div class="ml-5">
+                                    <h3 class="text-lg leading-6 font-medium text-white">Ancient Magic</h3>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <p class="text-sm text-gray-300">
+                                    Discover hidden tomes, learn Elarion Glyphs to cast environmental spells, collect Echo Shards containing voices of past kings, and unlock shadow portals.
+                                </p>
+                                <div class="mt-4">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-900 text-blue-100">
+                                        Spellcasting
+                                    </span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-900 text-blue-100 ml-1">
+                                        Rune magic
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mobs Card -->
+                    <div class="biome-card bg-gray-800 bg-opacity-70 rounded-lg overflow-hidden shadow-lg border border-blue-800 glow-box">
+                        <div class="p-5">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 bg-blue-900 rounded-md p-3">
+                                    <i class="fas fa-dragon text-blue-300 text-xl"></i>
+                                </div>
+                                <div class="ml-5">
+                                    <h3 class="text-lg leading-6 font-medium text-white">Mystical Beings</h3>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <p class="text-sm text-gray-300">
+                                    Encounter Wyrm-Riders, Shadowwraiths, Golem Guardians, Treebound Spirits, and Lost Watchers - each with unique behaviors and interactions.
+                                </p>
+                                <div class="mt-4">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-900 text-blue-100">
+                                        Faction system
+                                    </span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-900 text-blue-100 ml-1">
+                                        Dynamic AI
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Structures Card -->
+                    <div class="biome-card bg-gray-800 bg-opacity-70 rounded-lg overflow-hidden shadow-lg border border-blue-800 glow-box">
+                        <div class="p-5">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 bg-blue-900 rounded-md p-3">
+                                    <i class="fas fa-archway text-blue-300 text-xl"></i>
+                                </div>
+                                <div class="ml-5">
+                                    <h3 class="text-lg leading-6 font-medium text-white">Forgotten Structures</h3>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <p class="text-sm text-gray-300">
+                                    Explore the Crumbled Citadel, cross the Whispering Bridge, solve puzzles in the Elven Library, attend bard challenges at the Moonlit Amphitheater.
+                                </p>
+                                <div class="mt-4">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-900 text-blue-100">
+                                        Procedural ruins
+                                    </span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-900 text-blue-100 ml-1">
+                                        Hidden lore
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gameplay Card -->
+                    <div class="biome-card bg-gray-800 bg-opacity-70 rounded-lg overflow-hidden shadow-lg border border-blue-800 glow-box">
+                        <div class="p-5">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 bg-blue-900 rounded-md p-3">
+                                    <i class="fas fa-scroll text-blue-300 text-xl"></i>
+                                </div>
+                                <div class="ml-5">
+                                    <h3 class="text-lg leading-6 font-medium text-white">Deep Gameplay</h3>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <p class="text-sm text-gray-300">
+                                    Craft the Map of Elarion to reveal the biome, forge your own ring with multiple outcomes, make lore-driven choices, and track your light/shadow alignment.
+                                </p>
+                                <div class="mt-4">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-900 text-blue-100">
+                                        Branching quests
+                                    </span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-900 text-blue-100 ml-1">
+                                        Moral choices
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="gallery" class="py-12 bg-gray-900 bg-opacity-80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:text-center">
+                <h2 class="text-base text-blue-400 font-semibold tracking-wide uppercase">Gallery</h2>
+                <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-white sm:text-4xl glow-text">
+                    Glimpses of Elarion
+                </p>
+                <p class="mt-4 max-w-2xl text-xl text-gray-300 lg:mx-auto">
+                    Witness the beauty and mystery of this ancient land
+                </p>
+            </div>
+
+            <div class="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                <!-- Valewarden Forest -->
+                <div class="group relative">
+                    <div class="relative h-80 w-full overflow-hidden rounded-lg bg-gray-800 sm:aspect-h-1 sm:aspect-w-2 lg:aspect-h-1 lg:aspect-w-1 group-hover:opacity-75 sm:h-64">
+                        <img src="https://images.unsplash.com/photo-1476231682824-37e0bc4606b4?q=80&w=2070&auto=format&fit=crop" alt="Enchanted forest" class="h-full w-full object-cover object-center">
+                        <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 p-4">
+                            <h3 class="text-lg font-bold text-white">Valewarden Forest</h3>
+                            <p class="text-sm text-gray-300">Where ancient trees whisper forgotten secrets</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Runestone River -->
+                <div class="group relative">
+                    <div class="relative h-80 w-full overflow-hidden rounded-lg bg-gray-800 sm:aspect-h-1 sm:aspect-w-2 lg:aspect-h-1 lg:aspect-w-1 group-hover:opacity-75 sm:h-64">
+                        <img src="https://images.unsplash.com/photo-1605106702734-205df224ecce?q=80&w=2070&auto=format&fit=crop" alt="Glowing river" class="h-full w-full object-cover object-center">
+                        <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 p-4">
+                            <h3 class="text-lg font-bold text-white">Runestone River</h3>
+                            <p class="text-sm text-gray-300">Flowing with the magic of ancient civilizations</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sky Islands -->
+                <div class="group relative">
+                    <div class="relative h-80 w-full overflow-hidden rounded-lg bg-gray-800 sm:aspect-h-1 sm:aspect-w-2 lg:aspect-h-1 lg:aspect-w-1 group-hover:opacity-75 sm:h-64">
+                        <img src="https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?q=80&w=2070&auto=format&fit=crop" alt="Floating islands" class="h-full w-full object-cover object-center">
+                        <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 p-4">
+                            <h3 class="text-lg font-bold text-white">Floating Sky Islands</h3>
+                            <p class="text-sm text-gray-300">Remnants of a once-great empire</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Crumbled Citadel -->
+                <div class="group relative">
+                    <div class="relative h-80 w-full overflow-hidden rounded-lg bg-gray-800 sm:aspect-h-1 sm:aspect-w-2 lg:aspect-h-1 lg:aspect-w-1 group-hover:opacity-75 sm:h-64">
+                        <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=2048&auto=format&fit=crop" alt="Ancient ruins" class="h-full w-full object-cover object-center">
+                        <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 p-4">
+                            <h3 class="text-lg font-bold text-white">Crumbled Citadel</h3>
+                            <p class="text-sm text-gray-300">Test your wits against its trap-filled halls</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Moonlit Amphitheater -->
+                <div class="group relative">
+                    <div class="relative h-80 w-full overflow-hidden rounded-lg bg-gray-800 sm:aspect-h-1 sm:aspect-w-2 lg:aspect-h-1 lg:aspect-w-1 group-hover:opacity-75 sm:h-64">
+                        <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=2070&auto=format&fit=crop" alt="Moonlit ruins" class="h-full w-full object-cover object-center">
+                        <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 p-4">
+                            <h3 class="text-lg font-bold text-white">Moonlit Amphitheater</h3>
+                            <p class="text-sm text-gray-300">Where bards compete under the silver light</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shadow Portal -->
+                <div class="group relative">
+                    <div class="relative h-80 w-full overflow-hidden rounded-lg bg-gray-800 sm:aspect-h-1 sm:aspect-w-2 lg:aspect-h-1 lg:aspect-w-1 group-hover:opacity-75 sm:h-64">
+                        <img src="https://images.unsplash.com/photo-1518562180175-34a163b1a9a8?q=80&w=2070&auto=format&fit=crop" alt="Mystical portal" class="h-full w-full object-cover object-center">
+                        <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 p-4">
+                            <h3 class="text-lg font-bold text-white">Shadow Portal</h3>
+                            <p class="text-sm text-gray-300">Gateway to darker realms beyond</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Factions Section -->
+    <section class="py-12 bg-gray-900 bg-opacity-80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:text-center">
+                <h2 class="text-base text-blue-400 font-semibold tracking-wide uppercase">Factions</h2>
+                <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-white sm:text-4xl glow-text">
+                    Choose Your Allegiance
+                </p>
+                <p class="mt-4 max-w-2xl text-xl text-gray-300 lg:mx-auto">
+                    Your choices will shape Elarion's future
+                </p>
+            </div>
+
+            <div class="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+                <!-- Elves -->
+                <div class="biome-card bg-gray-800 bg-opacity-70 rounded-lg overflow-hidden shadow-lg border border-green-500">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-green-900 rounded-md p-3">
+                                <i class="fas fa-leaf text-green-300 text-xl"></i>
+                            </div>
+                            <div class="ml-5">
+                                <h3 class="text-lg leading-6 font-medium text-white">Elves of Eldarion</h3>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <p class="text-sm text-gray-300">
+                                Seek to restore the valley's former glory through magic and wisdom. Offer knowledge of ancient spells and crafting techniques.
+                            </p>
+                            <div class="mt-4">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-900 text-green-100">
+                                    Magic mastery
+                                </span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-900 text-green-100 ml-1">
+                                    Nature affinity
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dwarves -->
+                <div class="biome-card bg-gray-800 bg-opacity-70 rounded-lg overflow-hidden shadow-lg border border-yellow-500">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-yellow-900 rounded-md p-3">
+                                <i class="fas fa-helmet-battle text-yellow-300 text-xl"></i>
+                            </div>
+                            <div class="ml-5">
+                                <h3 class="text-lg leading-6 font-medium text-white">Dwarves of the Deep</h3>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <p class="text-sm text-gray-300">
+                                Seek the valley's mineral wealth and ancient forges. Offer superior armor and weapons, but their greed may awaken dark forces.
+                            </p>
+                            <div class="mt-4">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-900 text-yellow-100">
+                                    Smithing
+                                </span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-900 text-yellow-100 ml-1">
+                                    Treasure hunting
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rangers -->
+                <div class="biome-card bg-gray-800 bg-opacity-70 rounded-lg overflow-hidden shadow-lg border border-blue-500">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-blue-900 rounded-md p-3">
+                                <i class="fas fa-bow-arrow text-blue-300 text-xl"></i>
+                            </div>
+                            <div class="ml-5">
+                                <h3 class="text-lg leading-6 font-medium text-white">Rangers of the Westfold</h3>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <p class="text-sm text-gray-300">
+                                Seek to protect the valley from external threats. Offer survival skills, mounts, and knowledge of hidden paths.
+                            </p>
+                            <div class="mt-4">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-900 text-blue-100">
+                                    Archery
+                                </span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-900 text-blue-100 ml-1">
+                                    Tracking
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shadows -->
+                <div class="biome-card bg-gray-800 bg-opacity-70 rounded-lg overflow-hidden shadow-lg border border-purple-500">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-purple-900 rounded-md p-3">
+                                <i class="fas fa-skull text-purple-300 text-xl"></i>
+                            </div>
+                            <div class="ml-5">
+                                <h3 class="text-lg leading-6 font-medium text-white">Servants of Shadow</h3>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <p class="text-sm text-gray-300">
+                                Seek to claim the valley's power for dark purposes. Offer forbidden knowledge and powerful cursed artifacts.
+                            </p>
+                            <div class="mt-4">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-900 text-purple-100">
+                                    Necromancy
+                                </span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-900 text-purple-100 ml-1">
+                                    Dark rituals
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Moon Phase Widget -->
+    <section class="py-12 bg-gray-900 bg-opacity-80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:text-center">
+                <h2 class="text-base text-blue-400 font-semibold tracking-wide uppercase">Dynamic Magic</h2>
+                <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-white sm:text-4xl glow-text">
+                    The Moon's Influence
+                </p>
+                <p class="mt-4 max-w-2xl text-xl text-gray-300 lg:mx-auto">
+                    Elarion's magic waxes and wanes with the lunar cycle
+                </p>
+            </div>
+
+            <div class="mt-10 flex justify-center">
+                <div class="bg-gray-800 bg-opacity-70 rounded-xl p-8 max-w-2xl w-full border border-blue-800 glow-box">
+                    <div class="flex flex-col md:flex-row items-center">
+                        <div class="moon-phase w-32 h-32 rounded-full bg-blue-900 flex items-center justify-center text-white text-5xl mb-6 md:mb-0 md:mr-8">
+                            <i class="fas fa-moon"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white mb-2">Current Moon Phase: <span id="moonPhaseText">Waxing Crescent</span></h3>
+                            <p class="text-gray-300 mb-4">The biome currently has a <span id="moonEffectText">soft blue glow</span> and <span id="moonPowerText">moderate magical potency</span>.</p>
+                            <div class="grid grid-cols-4 gap-2">
+                                <div class="text-center">
+                                    <div class="w-8 h-8 rounded-full bg-gray-700 mx-auto flex items-center justify-center text-xs text-gray-300">New</div>
+                                    <div class="text-xs text-gray-400 mt-1">Portal seals weak</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="w-8 h-8 rounded-full bg-blue-900 mx-auto flex items-center justify-center text-xs text-blue-300">1Q</div>
+                                    <div class="text-xs text-gray-400 mt-1">Runestones glow</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="w-8 h-8 rounded-full bg-blue-700 mx-auto flex items-center justify-center text-xs text-white">Full</div>
+                                    <div class="text-xs text-gray-400 mt-1">Moonforge active</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="w-8 h-8 rounded-full bg-gray-700 mx-auto flex items-center justify-center text-xs text-gray-300">3Q</div>
+                                    <div class="text-xs text-gray-400 mt-1">Wraiths emerge</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download Section -->
+    <section id="download" class="py-12 bg-gray-900 bg-opacity-80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:text-center">
+                <h2 class="text-base text-blue-400 font-semibold tracking-wide uppercase">Download</h2>
+                <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-white sm:text-4xl glow-text">
+                    Begin Your Journey
+                </p>
+                <p class="mt-4 max-w-2xl text-xl text-gray-300 lg:mx-auto">
+                    Download the Elarion Valley biome mod today
+                </p>
+            </div>
+
+            <div class="mt-10">
+                <div class="bg-gray-800 bg-opacity-70 rounded-xl p-8 max-w-4xl mx-auto border border-blue-800 glow-box">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-xl font-bold text-white mb-4">Installation</h3>
+                            <ol class="list-decimal list-inside text-gray-300 space-y-2">
+                                <li>Ensure you have Minecraft Forge installed</li>
+                                <li>Download the Elarion Valley mod file</li>
+                                <li>Place the .jar file in your mods folder</li>
+                                <li>Launch Minecraft with Forge profile</li>
+                                <li>Craft the Map of Elarion to begin</li>
+                            </ol>
+                            <div class="mt-6">
+                                <h4 class="font-bold text-white mb-2">Requirements</h4>
+                                <ul class="text-sm text-gray-300 space-y-1">
+                                    <li><i class="fas fa-check-circle text-green-500 mr-2"></i> Minecraft 1.16.5 or newer</li>
+                                    <li><i class="fas fa-check-circle text-green-500 mr-2"></i> Forge 36.2.0 or newer</li>
+                                    <li><i class="fas fa-check-circle text-green-500 mr-2"></i> 4GB RAM minimum</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white mb-4">Download Options</h3>
+                            <div class="space-y-4">
+                                <a href="#" class="block w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md text-center font-medium">
+                                    <i class="fas fa-download mr-2"></i> Standard Version
+                                </a>
+                                <a href="#" class="block w-full bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-md text-center font-medium">
+                                    <i class="fas fa-music mr-2"></i> With Soundtrack
+                                </a>
+                                <a href="#" class="block w-full bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-md text-center font-medium">
+                                    <i class="fas fa-users mr-2"></i> Multiplayer Pack
+                                </a>
+                            </div>
+                            <div class="mt-6">
+                                <h4 class="font-bold text-white mb-2">Recommended Mods</h4>
+                                <ul class="text-sm text-gray-300 space-y-1">
+                                    <li><i class="fas fa-star text-yellow-500 mr-2"></i> OptiFine for better performance</li>
+                                    <li><i class="fas fa-star text-yellow-500 mr-2"></i> JourneyMap for navigation</li>
+                                    <li><i class="fas fa-star text-yellow-500 mr-2"></i> Sound Filters for immersive audio</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 bg-opacity-90 border-t border-blue-900">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-4">Elarion Valley</h3>
+                    <p class="text-gray-400">
+                        A Minecraft biome mod inspired by the aesthetic, geography, and mythos of Middle-earth.
+                    </p>
+                    <div class="mt-4 flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-discord"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#overview" class="text-gray-400 hover:text-white">Overview</a></li>
+                        <li><a href="#features" class="text-gray-400 hover:text-white">Features</a></li>
+                        <li><a href="#gallery" class="text-gray-400 hover:text-white">Gallery</a></li>
+                        <li><a href="#download" class="text-gray-400 hover:text-white">Download</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Documentation</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-4">Credits</h3>
+                    <p class="text-gray-400">
+                        Created by the Elarion Development Team. Inspired by the works of J.R.R. Tolkien.
+                    </p>
+                    <p class="text-gray-400 mt-2 text-sm">
+                        This is a fan-made project not affiliated with Minecraft or Middle-earth Enterprises.
+                    </p>
+                </div>
+            </div>
+            <div class="mt-12 border-t border-gray-800 pt-8">
+                <p class="text-gray-500 text-sm text-center">
+                    &copy; 2023 Elarion Valley Mod. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Elements -->
+    <div class="fixed bottom-10 right-10 floating">
+        <div class="runestone rounded-full w-16 h-16 flex items-center justify-center text-white text-2xl shadow-lg">
+            <i class="fas fa-ring flicker"></i>
+        </div>
+    </div>
+
+    <div class="fixed top-1/4 left-10 floating" style="animation-delay: 2s;">
+        <div class="bg-green-900 bg-opacity-70 rounded-full w-12 h-12 flex items-center justify-center text-white text-xl shadow-lg">
+            <i class="fas fa-leaf"></i>
+        </div>
+    </div>
+
+    <div class="fixed top-1/3 right-20 floating" style="animation-delay: 3s;">
+        <div class="shadow-realm rounded-full w-10 h-10 flex items-center justify-center text-white text-lg shadow-lg">
+            <i class="fas fa-skull"></i>
+        </div>
+    </div>
+
+    <script>
+        // Moon phase simulation
+        const moonPhases = [
+            { name: "New Moon", effect: "dim ambient lighting", power: "magic is weakest", icon: "fa-moon" },
+            { name: "Waxing Crescent", effect: "soft blue glow", power: "moderate magical potency", icon: "fa-moon" },
+            { name: "First Quarter", effect: "runestones glow brightly", power: "enhanced crafting", icon: "fa-moon" },
+            { name: "Waxing Gibbous", effect: "ethereal mist appears", power: "spells are stronger", icon: "fa-moon" },
+            { name: "Full Moon", effect: "vibrant silver light", power: "Moonforge active", icon: "fa-moon" },
+            { name: "Waning Gibbous", effect: "purple hues emerge", power: "shadow magic grows", icon: "fa-moon" },
+            { name: "Last Quarter", effect: "flickering lights", power: "wraiths emerge", icon: "fa-moon" },
+            { name: "Waning Crescent", effect: "deep blue tones", power: "portal seals weaken", icon: "fa-moon" }
+        ];
+
+        function updateMoonPhase() {
+            const now = new Date();
+            const phaseIndex = Math.floor((now.getTime() / 86400000) % 8); // Change daily for demo
+            
+            document.getElementById('moonPhaseText').textContent = moonPhases[phaseIndex].name;
+            document.getElementById('moonEffectText').textContent = moonPhases[phaseIndex].effect;
+            document.getElementById('moonPowerText').textContent = moonPhases[phaseIndex].power;
+            
+            const moonIcon = document.querySelector('.moon-phase i');
+            moonIcon.className = `fas ${moonPhases[phaseIndex].icon}`;
+            
+            // Adjust glow based on phase
+            const intensity = phaseIndex === 4 ? 1 : 0.5 + (0.5 * Math.sin(phaseIndex * Math.PI / 4));
+            document.querySelector('.moon-phase').style.boxShadow = `0 0 ${intensity * 20}px rgba(100, 200, 255, ${intensity})`;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateMoonPhase();
+            
+            // Change moon phase every 5 seconds for demo purposes
+            setInterval(updateMoonPhase, 5000);
+            
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
